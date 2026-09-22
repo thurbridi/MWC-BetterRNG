@@ -17,10 +17,11 @@ namespace BetterRNG
         private FsmInt _weekDay;
         private const int weekLength = 8; // it's Topless, don't ask
 
-        internal WeatherPatcher()
+        internal WeatherPatcher(INoise1D temperatureFunction)
         {
+            _temperatureGenerator = temperatureFunction;
+
             _forecast = GameObject.Find("MAP").transform.Find("WEATHER/Forecast");
-            _temperatureGenerator = new TemperatureGenerator();
             _ambientTemperature = FsmVariables.GlobalVariables.GetFsmFloat("AmbientTemperature");
             _weekly_temps = _forecast.gameObject.GetArrayListProxy("Weekly");
             _weekly_snow = _forecast.gameObject.GetArrayListProxy("Snow");

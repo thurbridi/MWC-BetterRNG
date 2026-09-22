@@ -34,10 +34,11 @@ namespace BetterRNG
         private void Mod_OnLoad()
         {
             // Called once, when mod is loading after game is fully loaded
-            var weather_fix = new WeatherPatcher();
+            var weather_fn = new TemperatureGenerator();
+
+            var weather_fix = new WeatherPatcher(weather_fn);
             weather_fix.Patch();
 
-            var weather_fn = new TemperatureGenerator();
 
             int sampleCount = 90;
             List<float> xs = new List<float>(sampleCount);
