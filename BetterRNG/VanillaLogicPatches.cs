@@ -10,45 +10,54 @@ namespace BetterRNG
     /// </summary>
     internal class WeatherPatcher
     {
-        private Transform _forecast, _clouds, _rain;
         private INoise1D _temperatureGenerator;
-        private FsmFloat _ambientTemperature;
-        private PlayMakerArrayListProxy _weekly_temps, _weekly_snow;
-        private FsmInt _weekDay;
+
+        private readonly PlayMakerFSM _forecastLogicFsm;
+        private readonly GameObject _clouds;
+        private readonly FsmFloat _ambientTemperature;
+        private readonly FsmBool _rain;
+        private readonly PlayMakerArrayListProxy _weekly_temps, _weekly_snow;
+        private readonly FsmInt _weekDay, _daysPassed;
+
         private const int weekLength = 8; // it's Topless, don't ask
 
         internal WeatherPatcher(INoise1D temperatureFunction)
         {
             _temperatureGenerator = temperatureFunction;
 
-            _forecast = GameObject.Find("MAP").transform.Find("WEATHER/Forecast");
             _ambientTemperature = FsmVariables.GlobalVariables.GetFsmFloat("AmbientTemperature");
-            _weekly_temps = _forecast.gameObject.GetArrayListProxy("Weekly");
-            _weekly_snow = _forecast.gameObject.GetArrayListProxy("Snow");
             _weekDay = FsmVariables.GlobalVariables.GetFsmInt("GlobalDay");
-            _clouds = GameObject.Find("MAP").transform.Find("WEATHER/Clouds/CloudObjects");
-            _rain = GameObject.Find("PLAYER").transform.Find("Rain");
+            _daysPassed = FsmVariables.GlobalVariables.GetFsmInt("DaysPassed");
+
+            var forecast = GameObject.Find("MAP").transform.Find("WEATHER/Forecast");
+            _forecastLogicFsm = forecast.GetPlayMaker("Logic");
+            _weekly_temps = forecast.gameObject.GetArrayListProxy("Weekly");
+            _weekly_snow = forecast.gameObject.GetArrayListProxy("Snow");
+
+            _clouds = GameObject.Find("MAP").transform.Find("WEATHER/Clouds/CloudObjects").gameObject;
+            _rain = GameObject.Find("PLAYER").transform.Find("Rain").GetPlayMaker("Rain").FsmVariables.GetFsmBool("RainYes");
         }
 
         public void Patch()
         {
-            var forecastLogicFsm = _forecast.GetPlayMaker("Logic");
-            forecastLogicFsm.enabled = false;
+            _forecastLogicFsm.enabled = false;
+            ModConsole.Log("Disabled vanilla weather logic.");
 
+            // Add a callback to the OnNextDay event to update the weather every week.
             GameTime.OnNextDay += (day) =>
             {
                 // Runs on sunday -> monday transition.
                 if (day == GameTime.Days.Monday)
                 {
-                    int daysPassed = FsmVariables.GlobalVariables.GetFsmInt("DaysPassed").Value;
-                    GenerateWeeklyWeather(daysPassed);
+                    GenerateWeeklyWeather(_daysPassed.Value);
                 }
 
-                SetAmbientTemperature((float)_weekly_temps._arrayList[_weekDay.Value]);
-                SetSnowyDay((bool)_weekly_snow._arrayList[_weekDay.Value]);
+                int weekDay = _weekDay.Value;
+                SetAmbientTemperature((float)_weekly_temps._arrayList[weekDay]);
+                SetSnowyDay((bool)_weekly_snow._arrayList[weekDay]);
             };
 
-            GenerateWatherForThisWeek();
+            GenerateWeatherForThisWeek();
         }
 
         private void SetAmbientTemperature(float value)
@@ -59,18 +68,19 @@ namespace BetterRNG
 
         private void SetSnowyDay(bool value)
         {
-            _clouds.gameObject.SetActive(value);
-            _rain.GetPlayMaker("Rain").FsmVariables.GetFsmBool("RainYes").Value = value;
+            _clouds.SetActive(value);
+            _rain.Value = value;
         }
 
-        private void GenerateWatherForThisWeek()
+        private void GenerateWeatherForThisWeek()
         {
-            int daysPassed = FsmVariables.GlobalVariables.GetFsmInt("DaysPassed").Value;
-            int currentWeekMondayDay = (daysPassed + 1) - _weekDay.Value;
+            int weekDay = _weekDay.Value;
+            int currentWeekMondayDay = (_daysPassed.Value + 1) - weekDay;
 
             GenerateWeeklyWeather(currentWeekMondayDay);
-            SetAmbientTemperature((float)_weekly_temps._arrayList[_weekDay.Value]);
-            SetSnowyDay((bool)_weekly_snow._arrayList[_weekDay.Value]);
+
+            SetAmbientTemperature((float)_weekly_temps._arrayList[weekDay]);
+            SetSnowyDay((bool)_weekly_snow._arrayList[weekDay]);
         }
 
         private void GenerateWeeklyWeather(int daysPassed)
