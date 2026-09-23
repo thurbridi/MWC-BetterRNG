@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using MSCLoader;
+using UnityEngine;
 
 namespace BetterRNG
 {
@@ -26,7 +26,6 @@ namespace BetterRNG
         public override void ModSetup()
         {
             SetupFunction(Setup.OnNewGame, Mod_OnNewGame);
-            SetupFunction(Setup.PreLoad, Mod_OnPreload);
             SetupFunction(Setup.OnLoad, Mod_OnLoad);
             SetupFunction(Setup.ModSettings, Mod_Settings);
             SetupFunction(Setup.ModSettingsLoaded, Mod_SettingsLoaded);
@@ -36,7 +35,7 @@ namespace BetterRNG
         {
             // All settings should be created here. 
             // DO NOT put anything that isn't settings or keybinds in here!
-            activeSeedText = Settings.AddText("Seed:");
+            activeSeedText = Settings.AddText("Seed:", TextAlignment.Center);
             enableUserSeedSetting = Settings.AddCheckBox("enableUserSeed", "Use fixed seed for RNG", false, onValueChanged: OnEnableUserSeedChanged);
             userSeedSetting = Settings.AddTextBox("userSeed", "Seed", string.Empty, "If left blank a random seed will be used.", visibleByDefault: false);
         }
@@ -47,11 +46,10 @@ namespace BetterRNG
             {
                 savedSeed = SaveLoad.ReadValue<string>(this, "seed");
             }
-            else
-            {
-                GenerateRandomSeed();
-            }
 
+            GenerateRandomSeed();
+
+            SetActiveSeedText("The seed value will appear here after loading.");
             OnEnableUserSeedChanged();
         }
 
@@ -61,9 +59,10 @@ namespace BetterRNG
             isNewGame = true;
             GenerateRandomSeed();
         }
-        private void Mod_OnPreload()
-        {
 
+        private void Mod_OnLoad()
+        {
+            // Called once, when mod is loading after game is fully loaded
             activeSeed = SeedResolver.ResolveSeed(userSeedSetting.GetValue(), savedSeed, randomSeed, isNewGame, enableUserSeedSetting.GetValue());
             SetActiveSeedText(activeSeed);
 
@@ -73,11 +72,7 @@ namespace BetterRNG
             }
 
             isNewGame = false;
-        }
 
-        private void Mod_OnLoad()
-        {
-            // Called once, when mod is loading after game is fully loaded
             var weather_fn = new TemperatureGenerator(activeSeed.GetHashCode());
 
             var weather_fix = new WeatherPatcher(weather_fn);
@@ -103,12 +98,12 @@ namespace BetterRNG
 
         private void GenerateRandomSeed()
         {
-            randomSeed = new Random().Next().ToString();
+            randomSeed = new System.Random().Next().ToString();
         }
 
         private void SetActiveSeedText(string value)
         {
-            activeSeedText.SetValue($"Seed: {value}");
+            activeSeedText.SetValue($"Active Seed: {value}");
         }
 
         private void OnEnableUserSeedChanged()
