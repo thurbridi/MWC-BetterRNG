@@ -15,9 +15,10 @@ namespace BetterRNG
 
 
         private bool isNewGame = false;
-        private string Seed { get; set; } /// The pre-hash seed used for RNG. This is either the user-provided seed or a randomly generated one.
-        private string RandomSeed { get; set; }
-        private SettingsText randomSeedText;
+        private string activeSeed = null;
+        private string savedSeed;
+        private string randomSeed;
+        private SettingsText activeSeedText;
         private SettingsCheckBox enableUserSeedSetting;
         private SettingsTextBox userSeedSetting;
 
@@ -27,7 +28,6 @@ namespace BetterRNG
             SetupFunction(Setup.OnNewGame, Mod_OnNewGame);
             SetupFunction(Setup.PreLoad, Mod_OnPreload);
             SetupFunction(Setup.OnLoad, Mod_OnLoad);
-            SetupFunction(Setup.OnSave, Mod_OnSave);
             SetupFunction(Setup.ModSettings, Mod_Settings);
             SetupFunction(Setup.ModSettingsLoaded, Mod_SettingsLoaded);
         }
@@ -36,21 +36,20 @@ namespace BetterRNG
         {
             // All settings should be created here. 
             // DO NOT put anything that isn't settings or keybinds in here!
+            activeSeedText = Settings.AddText("Seed:");
             enableUserSeedSetting = Settings.AddCheckBox("enableUserSeed", "Use fixed seed for RNG", false, onValueChanged: OnEnableUserSeedChanged);
             userSeedSetting = Settings.AddTextBox("userSeed", "Seed", string.Empty, "If left blank a random seed will be used.", visibleByDefault: false);
-            randomSeedText = Settings.AddText("Seed:");
         }
 
         private void Mod_SettingsLoaded()
         {
-            if (!SaveLoad.ValueExists(this, "seed"))
+            if (SaveLoad.ValueExists(this, "seed"))
             {
-                GenerateRandomSeed();
+                savedSeed = SaveLoad.ReadValue<string>(this, "seed");
             }
             else
             {
-                RandomSeed = SaveLoad.ReadValue<string>(this, "seed");
-                SetRandomSeedText(RandomSeed);
+                GenerateRandomSeed();
             }
 
             OnEnableUserSeedChanged();
@@ -64,25 +63,28 @@ namespace BetterRNG
         }
         private void Mod_OnPreload()
         {
-            SetSeedFromSettings(isNewGame, RandomSeed);
+
+            activeSeed = SeedResolver.ResolveSeed(userSeedSetting.GetValue(), savedSeed, randomSeed, isNewGame, enableUserSeedSetting.GetValue());
+            SetActiveSeedText(activeSeed);
 
             if (isNewGame)
             {
-                SaveLoad.WriteValue(this, "seed", Seed);
+                SaveLoad.WriteValue(this, "seed", activeSeed);
             }
+
+            isNewGame = false;
         }
 
         private void Mod_OnLoad()
         {
             // Called once, when mod is loading after game is fully loaded
-            var weather_fn = new TemperatureGenerator(Seed.GetHashCode());
+            var weather_fn = new TemperatureGenerator(activeSeed.GetHashCode());
 
             var weather_fix = new WeatherPatcher(weather_fn);
             weather_fix.Patch();
 
-            isNewGame = false;
 
-
+            // DEBUG: Create a graph of the temperature generator function
             int sampleCount = 90;
             List<float> xs = new List<float>(sampleCount);
             List<float> ys = new List<float>(sampleCount);
@@ -99,46 +101,19 @@ namespace BetterRNG
             graph.Init(xs, ys, "Temperature by day");
         }
 
-        private void Mod_OnSave()
-        {
-
-        }
-
-        private void SetSeedFromSettings(bool isNewGame, string savedSeed)
-        {
-            if (!isNewGame)
-            {
-                Seed = savedSeed;
-                return;
-            }
-
-            string userSeed = userSeedSetting.GetValue();
-
-            if (enableUserSeedSetting.GetValue() && !string.IsNullOrEmpty(userSeed))
-            {
-                Seed = userSeed;
-            }
-            else
-            {
-                Seed = RandomSeed;
-            }
-        }
-
         private void GenerateRandomSeed()
         {
-            RandomSeed = new Random().Next().ToString();
-            SetRandomSeedText(RandomSeed);
+            randomSeed = new Random().Next().ToString();
         }
 
-        private void SetRandomSeedText(string value)
+        private void SetActiveSeedText(string value)
         {
-            randomSeedText.SetValue($"Seed: {value}");
+            activeSeedText.SetValue($"Seed: {value}");
         }
 
         private void OnEnableUserSeedChanged()
         {
             userSeedSetting.SetVisibility(enableUserSeedSetting.GetValue());
-            randomSeedText.SetVisibility(!enableUserSeedSetting.GetValue());
         }
     }
 }

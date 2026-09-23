@@ -65,6 +65,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Noise.cs" />
     <Compile Include="DebugGraphWindow.cs" />
+    <Compile Include="SeedResolver.cs" />
     <Compile Include="TemperatureGenerator.cs" />
     <Compile Include="VanillaLogicPatches.cs" />
   </ItemGroup>
