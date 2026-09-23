@@ -40,12 +40,15 @@ namespace BetterRNG
                 // Runs on sunday -> monday transition.
                 if (day == GameTime.Days.Monday)
                 {
-                    GenerateWeeklyWeather();
+                    int daysPassed = FsmVariables.GlobalVariables.GetFsmInt("DaysPassed").Value;
+                    GenerateWeeklyWeather(daysPassed);
                 }
 
                 SetAmbientTemperature((float)_weekly_temps._arrayList[_weekDay.Value]);
                 SetSnowyDay((bool)_weekly_snow._arrayList[_weekDay.Value]);
             };
+
+            GenerateWatherForThisWeek();
         }
 
         private void SetAmbientTemperature(float value)
@@ -60,11 +63,18 @@ namespace BetterRNG
             _rain.GetPlayMaker("Rain").FsmVariables.GetFsmBool("RainYes").Value = value;
         }
 
-        private void GenerateWeeklyWeather()
+        private void GenerateWatherForThisWeek()
         {
             int daysPassed = FsmVariables.GlobalVariables.GetFsmInt("DaysPassed").Value;
+            int currentWeekMondayDay = (daysPassed + 1) - _weekDay.Value;
 
+            GenerateWeeklyWeather(currentWeekMondayDay);
+            SetAmbientTemperature((float)_weekly_temps._arrayList[_weekDay.Value]);
+            SetSnowyDay((bool)_weekly_snow._arrayList[_weekDay.Value]);
+        }
 
+        private void GenerateWeeklyWeather(int daysPassed)
+        {
             // Vanilla logic stores temps in an array with size 8 but leaves index 0 unused.
             for (int i = 1; i < weekLength; i++)
             {

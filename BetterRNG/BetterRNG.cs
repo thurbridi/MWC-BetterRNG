@@ -70,8 +70,6 @@ namespace BetterRNG
             {
                 SaveLoad.WriteValue(this, "seed", Seed);
             }
-
-            isNewGame = false;
         }
 
         private void Mod_OnLoad()
@@ -81,6 +79,8 @@ namespace BetterRNG
 
             var weather_fix = new WeatherPatcher(weather_fn);
             weather_fix.Patch();
+
+            isNewGame = false;
 
 
             int sampleCount = 90;
