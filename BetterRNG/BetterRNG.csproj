@@ -62,6 +62,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BetterRNG.cs" />
+    <Compile Include="TimeAdapter.cs" />
+    <Compile Include="WeatherAdapter.cs" />
+    <Compile Include="ForecastAdapter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Noise.cs" />
     <Compile Include="DebugGraphWindow.cs" />
