@@ -13,6 +13,7 @@ namespace BetterRNG
         private readonly ForecastAdapter _forecast;
         private readonly WeatherAdapter _weather;
         private readonly TimeAdapter _time;
+        private readonly TVAdapter _tv;
 
         private const int weekLength = 7;
 
@@ -22,6 +23,7 @@ namespace BetterRNG
             _forecast = new ForecastAdapter();
             _weather = new WeatherAdapter();
             _time = new TimeAdapter();
+            _tv = new TVAdapter();
         }
 
         public void Patch()
@@ -47,14 +49,20 @@ namespace BetterRNG
                     GenerateWeeklyWeather(_time.GetDaysPassed());
                 }
 
+                _tv.ResetTvNoise();
+
                 int weekDay = _time.GetWeekDay();
                 _weather.SetAmbientTemperature(_forecast.GetWeeklyTemperature(weekDay));
                 _weather.SetSnowyDay(_forecast.GetWeeklySnow(weekDay));
+                _forecast.SetSnowy(_forecast.GetWeeklySnow(weekDay));
+
             };
         }
 
         private void GenerateWeatherForThisWeek()
         {
+            _tv.ResetTvNoise();
+
             int weekDay = _time.GetWeekDay();
             int currentWeekMondayDay = _time.GetDaysPassed() - weekDay;
 
@@ -62,6 +70,7 @@ namespace BetterRNG
 
             _weather.SetAmbientTemperature(_forecast.GetWeeklyTemperature(weekDay));
             _weather.SetSnowyDay(_forecast.GetWeeklySnow(weekDay));
+            _forecast.SetSnowy(_forecast.GetWeeklySnow(weekDay));
         }
 
         private void GenerateWeeklyWeather(int daysPassed)
@@ -76,7 +85,7 @@ namespace BetterRNG
             for (int i = 0; i < weekLength; i++)
             {
                 float temp = _forecast.GetWeeklyTemperature(i);
-                _forecast.SetWeeklySnow(i, temp > -7f && Random.value < 0.35f);
+                _forecast.SetWeeklySnow(i, temp > -7f && Random.value < 0.65f);
             }
         }
     }

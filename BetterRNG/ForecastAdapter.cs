@@ -1,4 +1,5 @@
-﻿using MSCLoader;
+﻿using HutongGames.PlayMaker;
+using MSCLoader;
 using UnityEngine;
 
 namespace BetterRNG
@@ -10,6 +11,7 @@ namespace BetterRNG
     {
         private readonly PlayMakerFSM _forecastLogicFsm;
         private readonly PlayMakerArrayListProxy _weekly_temps, _weekly_snow;
+        private readonly FsmBool _snowy;
 
         public ForecastAdapter()
         {
@@ -17,6 +19,7 @@ namespace BetterRNG
             _forecastLogicFsm = forecast.GetPlayMaker("Logic");
             _weekly_temps = forecast.gameObject.GetArrayListProxy("Weekly");
             _weekly_snow = forecast.gameObject.GetArrayListProxy("Snow");
+            _snowy = _forecastLogicFsm.FsmVariables.GetFsmBool("Snowy");
         }
 
         public void SetLogicFsmActive(bool isActive)
@@ -46,6 +49,16 @@ namespace BetterRNG
         {
             int oneBasedIndex = ToWeekIndex(index);
             _weekly_snow._arrayList[oneBasedIndex] = isSnowy;
+        }
+
+        public void SetSnowy(bool isSnowy)
+        {
+            _snowy.Value = isSnowy;
+        }
+
+        public bool GetSnowy()
+        {
+            return _snowy.Value;
         }
 
         private int ToWeekIndex(int index)
