@@ -1,4 +1,5 @@
 ﻿using HutongGames.PlayMaker;
+using MSCCoreLibrary;
 
 namespace BetterRNG
 {
@@ -31,6 +32,15 @@ namespace BetterRNG
         public int GetWeekDay()
         {
             return _weekDay.Value - 1;
+        }
+
+        /// <summary>
+        /// Days passed in the save file as a float, including the fraction of the current day that has passed.
+        /// </summary>
+        /// <returns>The number of days passed as a float, including the fraction of the current day.</returns>
+        public float GetDayFraction()
+        {
+            return GetDaysPassed() + GameTime.Hour / 24f + GameTime.Minute / 1440f;
         }
     }
 }

@@ -34,6 +34,8 @@ namespace BetterRNG
             ScheduleWeeklyWeatherGeneration();
 
             GenerateWeatherForThisWeek();
+
+            _forecast.AddTemperatureBehaviour(UpdateTemperature);
         }
 
         /// <summary>
@@ -52,7 +54,7 @@ namespace BetterRNG
                 _tv.ResetTvNoise();
 
                 int weekDay = _time.GetWeekDay();
-                _weather.SetAmbientTemperature(_forecast.GetWeeklyTemperature(weekDay));
+                UpdateTemperature();
                 _weather.SetSnowyDay(_forecast.GetWeeklySnow(weekDay));
                 _forecast.SetSnowy(_forecast.GetWeeklySnow(weekDay));
 
@@ -68,7 +70,7 @@ namespace BetterRNG
 
             GenerateWeeklyWeather(currentWeekMondayDay);
 
-            _weather.SetAmbientTemperature(_forecast.GetWeeklyTemperature(weekDay));
+            UpdateTemperature();
             _weather.SetSnowyDay(_forecast.GetWeeklySnow(weekDay));
             _forecast.SetSnowy(_forecast.GetWeeklySnow(weekDay));
         }
@@ -87,6 +89,11 @@ namespace BetterRNG
                 float temp = _forecast.GetWeeklyTemperature(i);
                 _forecast.SetWeeklySnow(i, temp > -7f && Random.value < 0.65f);
             }
+        }
+
+        private void UpdateTemperature()
+        {
+            _weather.SetAmbientTemperature(_temperatureGenerator.Sample(_time.GetDayFraction()));
         }
     }
 }

@@ -29,6 +29,7 @@ namespace BetterRNG
             SetupFunction(Setup.OnLoad, Mod_OnLoad);
             SetupFunction(Setup.ModSettings, Mod_Settings);
             SetupFunction(Setup.ModSettingsLoaded, Mod_SettingsLoaded);
+            SetupFunction(Setup.Update, Mod_Update);
         }
 
         private void Mod_Settings()
@@ -77,8 +78,10 @@ namespace BetterRNG
 
             var temperatureFn = new TemperatureGenerator([
                 new NoiseFunction1D(valueNoise, 0.35f, 0.85f, 0f),
-                new NoiseFunction1D(valueNoise, 0.6f, 0.15f, 0f),
-            ], new NoiseFunction1D(valueNoise, 0.2f, 1f, 0f), warmupPeriodDays: 7f, startingTemperature: -7f)
+                new NoiseFunction1D(valueNoise, 0.6f, 0.15f, 0f)],
+                coldNoise: new NoiseFunction1D(valueNoise, 0.2f, 1f, 0f),
+                warmupPeriodDays: 7f,
+                startingTemperature: -7f)
             {
                 Amplitude = 15f,
                 Offset = -16f,
@@ -101,6 +104,12 @@ namespace BetterRNG
             }
 
             CreateDebugGraphWindow(xs, ys, "Temperature by day", -45f, 0f);
+        }
+
+        private void Mod_Update()
+        {
+            // Called every frame, after the game has been fully loaded
+
         }
 
         private void CreateDebugGraphWindow(List<float> xs, List<float> ys, string title, float minY, float maxY)

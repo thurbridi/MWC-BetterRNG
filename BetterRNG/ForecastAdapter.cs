@@ -1,4 +1,5 @@
-﻿using HutongGames.PlayMaker;
+﻿using System;
+using HutongGames.PlayMaker;
 using MSCLoader;
 using UnityEngine;
 
@@ -12,14 +13,27 @@ namespace BetterRNG
         private readonly PlayMakerFSM _forecastLogicFsm;
         private readonly PlayMakerArrayListProxy _weekly_temps, _weekly_snow;
         private readonly FsmBool _snowy;
+        private readonly GameObject _forecastObject;
 
         public ForecastAdapter()
         {
             var forecast = GameObject.Find("MAP").transform.Find("WEATHER/Forecast");
+            _forecastObject = forecast.gameObject;
             _forecastLogicFsm = forecast.GetPlayMaker("Logic");
             _weekly_temps = forecast.gameObject.GetArrayListProxy("Weekly");
             _weekly_snow = forecast.gameObject.GetArrayListProxy("Snow");
             _snowy = _forecastLogicFsm.FsmVariables.GetFsmBool("Snowy");
+        }
+
+        public void AddTemperatureBehaviour(Action updateTemperature)
+        {
+            var behaviour = _forecastObject.GetComponent<TemperatureBehaviour>();
+            if (!behaviour)
+            {
+                behaviour = _forecastObject.AddComponent<TemperatureBehaviour>();
+            }
+
+            behaviour.Initialize(updateTemperature);
         }
 
         public void SetLogicFsmActive(bool isActive)
