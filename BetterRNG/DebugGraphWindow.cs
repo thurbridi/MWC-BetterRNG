@@ -8,6 +8,9 @@ namespace BetterRNG
         public List<float> Xs;
         public List<float> Ys;
         public string Title = "ValueNoise Graph";
+        public bool UseFixedYRange;
+        public float FixedMinY;
+        public float FixedMaxY;
 
         private Rect windowRect = new Rect(1490, 40, 400, 300);
         private Vector2 graphPadding = new Vector2(40, 40);
@@ -19,9 +22,19 @@ namespace BetterRNG
             Xs = xs;
             Ys = ys;
             Title = title;
+            UseFixedYRange = false;
+
             lineTex = new Texture2D(1, 1, TextureFormat.ARGB32, false);
             lineTex.SetPixel(0, 0, Color.white); // Use white so GUI.color tints correctly
             lineTex.Apply();
+        }
+
+        public void Init(List<float> xs, List<float> ys, string title, float minY, float maxY)
+        {
+            Init(xs, ys, title);
+            UseFixedYRange = true;
+            FixedMinY = minY;
+            FixedMaxY = maxY;
         }
 
         private void OnGUI()
@@ -47,6 +60,7 @@ namespace BetterRNG
             }
             // Do not draw the graph here!
         }
+
         private void DrawGraph()
         {
             if (Xs == null || Ys == null || Xs.Count != Ys.Count || Xs.Count < 2)
@@ -56,6 +70,12 @@ namespace BetterRNG
             float maxX = Mathf.Max(Xs.ToArray());
             float minY = Mathf.Min(Ys.ToArray());
             float maxY = Mathf.Max(Ys.ToArray());
+
+            if (UseFixedYRange)
+            {
+                minY = Mathf.Min(FixedMinY, FixedMaxY);
+                maxY = Mathf.Max(FixedMinY, FixedMaxY);
+            }
 
             float graphWidth = windowRect.width - 2 * graphPadding.x;
             float graphHeight = windowRect.height - 2 * graphPadding.y;
@@ -126,7 +146,7 @@ namespace BetterRNG
             for (int i = 0; i < Xs.Count; i++)
             {
                 float xNorm = (Xs[i] - minX) / (maxX - minX + Mathf.Epsilon);
-                float yNorm = (Ys[i] - minY) / (maxY - minY + Mathf.Epsilon);
+                float yNorm = Mathf.Clamp01((Ys[i] - minY) / (maxY - minY + Mathf.Epsilon));
 
                 Vector2 pt = new Vector2(
                     windowRect.x + graphPadding.x + xNorm * graphWidth,

@@ -73,27 +73,42 @@ namespace BetterRNG
 
             isNewGame = false;
 
-            var weather_fn = new TemperatureGenerator(activeSeed.GetHashCode());
+            var valueNoise = new ValueNoise(size: 64, seed: activeSeed.GetHashCode());
 
-            var weather_fix = new WeatherPatcher(weather_fn);
+            var temperatureFn = new TemperatureGenerator([
+                new NoiseFunction1D(valueNoise, 0.3f, 0.85f, 0f),
+                new NoiseFunction1D(valueNoise, 0.6f, 0.15f, 0f),
+            ], new NoiseFunction1D(valueNoise, 0.2f, 1f, 0f))
+            {
+                Amplitude = 15f,
+                Offset = -16f,
+                ColdAmplitude = 15f,
+            };
+
+            var weather_fix = new WeatherPatcher(temperatureFn);
             weather_fix.Patch();
 
 
             // DEBUG: Create a graph of the temperature generator function
             int sampleCount = 90;
-            List<float> xs = new List<float>(sampleCount);
-            List<float> ys = new List<float>(sampleCount);
+            List<float> xs = new(sampleCount);
+            List<float> ys = new(sampleCount);
             for (int i = 0; i < sampleCount; i++)
             {
                 float x = i * 1f;
                 xs.Add(x);
-                ys.Add(weather_fn.Sample(x));
+                ys.Add(temperatureFn.Sample(x));
             }
 
+            CreateDebugGraphWindow(xs, ys, "Temperature by day", -45f, 0f);
+        }
+
+        private void CreateDebugGraphWindow(List<float> xs, List<float> ys, string title, float minY, float maxY)
+        {
             // Create a GameObject to host the graph window
-            var go = new UnityEngine.GameObject("ValueNoiseGraphWindow");
+            var go = new GameObject("ValueNoiseGraphWindow");
             var graph = go.AddComponent<DebugGraphWindow>();
-            graph.Init(xs, ys, "Temperature by day");
+            graph.Init(xs, ys, title, minY, maxY);
         }
 
         private void GenerateRandomSeed()

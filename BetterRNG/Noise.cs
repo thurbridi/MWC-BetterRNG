@@ -37,12 +37,6 @@ namespace BetterRNG
         private readonly uint _size = 10;
         private float[] _values;
 
-        private ValueNoise(uint size, float[] values)
-        {
-            _size = size;
-            _values = values;
-        }
-
         public ValueNoise(uint size, Int32 seed)
         {
             _size = size;
@@ -60,11 +54,6 @@ namespace BetterRNG
             var rng = new Random(seed);
 
             InitializeValues(rng);
-        }
-
-        public static ValueNoise FromList(float[] values)
-        {
-            return new ValueNoise((uint)values.Length, values);
         }
 
         private void InitializeValues(Random rng)

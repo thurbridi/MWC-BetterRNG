@@ -1,23 +1,39 @@
-﻿using System;
-
-namespace BetterRNG
+﻿namespace BetterRNG
 {
     internal class TemperatureGenerator : INoise1D
     {
-        private INoise1D _noise_src, _noise_a, _noise_b, _noise_c, _noise_d;
+        public float Amplitude { get; set; } = 20f;
+        public float Offset { get; set; } = -22f;
+        private readonly INoise1D[] _noiseLayers;
+        private readonly INoise1D _coldNoise;
+        public float ColdAmplitude { get; set; } = 15f;
 
-        internal TemperatureGenerator(Int32 seed = 777)
+        internal TemperatureGenerator(INoise1D[] noiseLayers, INoise1D coldNoise = null)
         {
-            _noise_src = new ValueNoise(size: 64, seed);
-            _noise_a = new NoiseFunction1D(_noise_src, 0.2f, 0.4f, 0f);
-            _noise_b = new NoiseFunction1D(_noise_src, 0.4f, 0.3f, 0f);
-            _noise_c = new NoiseFunction1D(_noise_src, 0.8f, 0.2f, 0f);
-            _noise_d = new NoiseFunction1D(_noise_src, 1.6f, 0.1f, 0f);
+            _noiseLayers = noiseLayers;
+            _coldNoise = coldNoise;
         }
 
         public float Sample(float x)
         {
-            return (_noise_a.Sample(x) + _noise_b.Sample(x) + _noise_c.Sample(x) + _noise_d.Sample(x)) * 20 - 22;
+            float sample = 0f;
+            foreach (INoise1D noiseLayer in _noiseLayers)
+            {
+                sample += noiseLayer.Sample(x);
+            }
+
+            sample = sample * Amplitude + Offset;
+
+            if (_coldNoise != null)
+            {
+                float cold = _coldNoise.Sample(x);
+                if (cold < 0f)
+                {
+                    sample += cold * ColdAmplitude;
+                }
+            }
+
+            return sample;
         }
     }
 }
