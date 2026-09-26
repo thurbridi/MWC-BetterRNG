@@ -29,7 +29,6 @@ namespace BetterRNG
             SetupFunction(Setup.OnLoad, Mod_OnLoad);
             SetupFunction(Setup.ModSettings, Mod_Settings);
             SetupFunction(Setup.ModSettingsLoaded, Mod_SettingsLoaded);
-            SetupFunction(Setup.Update, Mod_Update);
         }
 
         private void Mod_Settings()
@@ -104,12 +103,6 @@ namespace BetterRNG
             }
 
             CreateDebugGraphWindow(xs, ys, "Temperature by day", -45f, 0f);
-        }
-
-        private void Mod_Update()
-        {
-            // Called every frame, after the game has been fully loaded
-
         }
 
         private void CreateDebugGraphWindow(List<float> xs, List<float> ys, string title, float minY, float maxY)
