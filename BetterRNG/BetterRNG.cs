@@ -76,9 +76,9 @@ namespace BetterRNG
             var valueNoise = new ValueNoise(size: 64, seed: activeSeed.GetHashCode());
 
             var temperatureFn = new TemperatureGenerator([
-                new NoiseFunction1D(valueNoise, 0.3f, 0.85f, 0f),
+                new NoiseFunction1D(valueNoise, 0.35f, 0.85f, 0f),
                 new NoiseFunction1D(valueNoise, 0.6f, 0.15f, 0f),
-            ], new NoiseFunction1D(valueNoise, 0.2f, 1f, 0f))
+            ], new NoiseFunction1D(valueNoise, 0.2f, 1f, 0f), warmupPeriodDays: 7f, startingTemperature: -7f)
             {
                 Amplitude = 15f,
                 Offset = -16f,
@@ -90,7 +90,7 @@ namespace BetterRNG
 
 
             // DEBUG: Create a graph of the temperature generator function
-            int sampleCount = 90;
+            int sampleCount = 30;
             List<float> xs = new(sampleCount);
             List<float> ys = new(sampleCount);
             for (int i = 0; i < sampleCount; i++)

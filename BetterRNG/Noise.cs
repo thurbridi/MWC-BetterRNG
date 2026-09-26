@@ -2,6 +2,24 @@
 
 namespace BetterRNG
 {
+    public static class NoiseUtils
+    {
+        public static float SmoothStep(float x)
+        {
+            return x * x * (3f - 2f * x);
+        }
+
+        public static float Lerp(float a, float b, float t)
+        {
+            return a + t * (b - a);
+        }
+
+        public static float Clamp(float value, float min, float max)
+        {
+            return System.Math.Max(min, System.Math.Min(max, value));
+        }
+    }
+
     public interface INoise1D
     {
         public float Sample(float x);
@@ -81,19 +99,9 @@ namespace BetterRNG
 
             float t = _x - x0;
 
-            t = SmoothStep(t);
+            t = NoiseUtils.SmoothStep(t);
 
-            return Lerp(v0, v1, t);
-        }
-
-        private static float SmoothStep(float x)
-        {
-            return x * x * (3 - 2 * x);
-        }
-
-        private static float Lerp(float a, float b, float t)
-        {
-            return a + t * (b - a);
+            return NoiseUtils.Lerp(v0, v1, t);
         }
     }
 }
