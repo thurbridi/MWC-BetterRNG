@@ -87,7 +87,9 @@ namespace BetterRNG
                 ColdAmplitude = 15f,
             };
 
-            var weather_fix = new WeatherPatcher(temperatureFn);
+            var snowGenerator = new SnowForecastGenerator(new System.Random(activeSeed.GetHashCode()));
+
+            var weather_fix = new WeatherPatcher(temperatureFn, snowGenerator);
             weather_fix.Patch();
 
 

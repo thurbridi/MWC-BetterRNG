@@ -1,6 +1,5 @@
 ﻿using MSCCoreLibrary;
 using MSCLoader;
-using UnityEngine;
 
 namespace BetterRNG
 {
@@ -10,6 +9,7 @@ namespace BetterRNG
     internal class WeatherPatcher
     {
         private INoise1D _temperatureGenerator;
+        private SnowForecastGenerator _snowForecastGenerator;
         private readonly ForecastAdapter _forecast;
         private readonly WeatherAdapter _weather;
         private readonly TimeAdapter _time;
@@ -17,9 +17,10 @@ namespace BetterRNG
 
         private const int weekLength = 7;
 
-        internal WeatherPatcher(INoise1D temperatureFunction)
+        internal WeatherPatcher(INoise1D temperatureFunction, SnowForecastGenerator snowForecastGenerator)
         {
             _temperatureGenerator = temperatureFunction;
+            _snowForecastGenerator = snowForecastGenerator;
             _forecast = new ForecastAdapter();
             _weather = new WeatherAdapter();
             _time = new TimeAdapter();
@@ -87,7 +88,8 @@ namespace BetterRNG
             for (int i = 0; i < weekLength; i++)
             {
                 float temp = _forecast.GetWeeklyTemperature(i);
-                _forecast.SetWeeklySnow(i, temp > -7f && Random.value < 0.65f);
+                bool snowing = _snowForecastGenerator.GetSnowForTemp(temp);
+                _forecast.SetWeeklySnow(i, snowing);
             }
         }
 
