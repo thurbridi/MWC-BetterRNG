@@ -16,7 +16,7 @@ namespace BetterRNG
         {
             if (warmupPeriodDays < 0f)
             {
-                throw new System.ArgumentOutOfRangeException(nameof(warmupPeriodDays), "Warmup period must be non-negative.");
+                throw new ArgumentOutOfRangeException(nameof(warmupPeriodDays), "Warmup period must be non-negative.");
             }
 
             _noiseLayers = noiseLayers;

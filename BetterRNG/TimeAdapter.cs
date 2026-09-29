@@ -12,7 +12,7 @@ namespace BetterRNG
         private readonly FsmInt _weekDay;
         public TimeAdapter()
         {
-            _daysPassed = FsmVariables.GlobalVariables.GetFsmInt("DaysPassed");
+            _daysPassed = FsmVariables.GlobalVariables.GetFsmInt("GlobalDaysPassed");
             _weekDay = FsmVariables.GlobalVariables.GetFsmInt("GlobalDay");
         }
 

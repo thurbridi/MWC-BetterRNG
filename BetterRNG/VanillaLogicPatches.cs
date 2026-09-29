@@ -33,6 +33,7 @@ namespace BetterRNG
             ModConsole.Log("Disabled vanilla weather logic.");
 
             ScheduleWeeklyWeatherGeneration();
+            ModConsole.Log("Scheduled weekly weather generation.");
 
             GenerateWeatherForThisWeek();
 
