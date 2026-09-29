@@ -9,7 +9,7 @@ namespace BetterRNG
         public override string ID => "BetterRNG"; // Your (unique) mod ID 
         public override string Name => "BetterRNG"; // Your mod name
         public override string Author => "casper-3"; // Name of the Author (your name)
-        public override string Version => "0.2.1"; // Version
+        public override string Version => "0.2.2"; // Version
         public override string Description => "Replaces random walk method used in weather generation and other systems."; // Short description of your mod 
         public override Game SupportedGames => Game.MyWinterCar;
 
