@@ -80,7 +80,7 @@ namespace BetterRNG
                 new NoiseFunction1D(valueNoise, 0.6f, 0.15f, 0f)],
                 coldNoise: new NoiseFunction1D(valueNoise, 0.2f, 1f, 0f),
                 warmupPeriodDays: 7f,
-                startingTemperature: -7f)
+                startingTemperature: -11f)
             {
                 Amplitude = 15f,
                 Offset = -16f,
