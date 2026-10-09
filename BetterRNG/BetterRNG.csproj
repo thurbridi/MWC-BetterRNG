@@ -62,12 +62,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BetterRNG.cs" />
+    <Compile Include="Adapters\ScrapMetalPriceAdapter.cs" />
     <Compile Include="SnowForecastGenerator.cs" />
     <Compile Include="TemperatureBehaviour.cs" />
-    <Compile Include="TimeAdapter.cs" />
-    <Compile Include="TVAdapter.cs" />
-    <Compile Include="WeatherAdapter.cs" />
-    <Compile Include="ForecastAdapter.cs" />
+    <Compile Include="Adapters\TimeAdapter.cs" />
+    <Compile Include="Adapters\TVAdapter.cs" />
+    <Compile Include="Adapters\WeatherAdapter.cs" />
+    <Compile Include="Adapters\ForecastAdapter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Noise.cs" />
     <Compile Include="DebugGraphWindow.cs" />

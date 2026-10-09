@@ -89,7 +89,7 @@ namespace BetterRNG
             for (int i = 0; i < weekLength; i++)
             {
                 float temp = _forecast.GetWeeklyTemperature(i);
-                bool snowing = _snowForecastGenerator.GetSnowForTemp(temp);
+                bool snowing = _snowForecastGenerator.GetSnowForTemp(temp, daysPassed + i);
                 _forecast.SetWeeklySnow(i, snowing);
             }
         }
