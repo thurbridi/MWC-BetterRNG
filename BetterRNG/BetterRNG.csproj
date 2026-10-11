@@ -63,6 +63,7 @@
   <ItemGroup>
     <Compile Include="BetterRNG.cs" />
     <Compile Include="Adapters\ScrapMetalPriceAdapter.cs" />
+    <Compile Include="ScrapMetalPriceGenerator.cs" />
     <Compile Include="SnowForecastGenerator.cs" />
     <Compile Include="TemperatureBehaviour.cs" />
     <Compile Include="Adapters\TimeAdapter.cs" />

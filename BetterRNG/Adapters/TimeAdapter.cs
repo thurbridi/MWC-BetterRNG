@@ -34,6 +34,13 @@ namespace BetterRNG
             return _weekDay.Value - 1;
         }
 
+        public int GetBusinessDaysPassed()
+        {
+            int daysPassed = GetDaysPassed();
+            int dayOfWeek = GetWeekDay();
+            return daysPassed / 7 * 5 + (dayOfWeek < 5 ? dayOfWeek : 5);
+        }
+
         /// <summary>
         /// Days passed in the save file as a float, including the fraction of the current day that has passed.
         /// </summary>

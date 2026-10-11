@@ -99,4 +99,70 @@ namespace BetterRNG
             _weather.SetAmbientTemperature(_temperatureGenerator.Sample(_time.GetDayFraction()));
         }
     }
+
+    /// <summary>
+    /// Substitutes vanilla scrap metal price Random Walk method with Value Noise. 
+    /// 
+    /// Vanilla method is a mix of markov chain and random walk. 
+    /// 90% chance to have a small change ([-0.15, 0.15]), 5% chance to have a large positive change ([0.2, 1.5] and a %5 chance to have a large negative change [-1.75, -0.5]. 
+    /// Notice a bias towards negative changes.
+    /// 
+    /// Price is capped between 0.07 and 90.
+    /// 
+    /// The scrap metal price for the week is updated every business day at 10am.
+    /// </summary>
+    internal class ScrapMetalPricePatcher
+    {
+        private readonly ScrapMetalPriceAdapter _scrapMetalPriceAdapter;
+        private readonly TimeAdapter _time;
+        private readonly INoise1D _priceGenerator;
+
+        internal ScrapMetalPricePatcher(INoise1D priceGenerator)
+        {
+            _scrapMetalPriceAdapter = new ScrapMetalPriceAdapter();
+            _time = new TimeAdapter();
+            _priceGenerator = priceGenerator;
+        }
+
+        public void Patch()
+        {
+            _scrapMetalPriceAdapter.SetLogicFsmActive(false);
+            ModConsole.Log("Disabled vanilla scrap metal price logic.");
+            GeneratePriceHistory();
+            ScheduleScrapMetalPriceUpdate();
+            ModConsole.Log("Scheduled scrap metal price updates.");
+        }
+
+        private void ScheduleScrapMetalPriceUpdate()
+        {
+            TimeScheduler.ScheduleAction(
+                hour: 10,
+                minute: 0,
+                action: UpdateScrapMetalPrice,
+                day: GameTime.Days.Week
+            );
+        }
+
+        private void GeneratePriceHistory()
+        {
+            int currentBusinessDay = _time.GetBusinessDaysPassed();
+
+            for (int daysAgo = ScrapMetalPriceAdapter.historyLength - 1; daysAgo > 0; daysAgo--)
+            {
+                _scrapMetalPriceAdapter.PushPrice(GetPrice(currentBusinessDay - daysAgo));
+            }
+
+            _scrapMetalPriceAdapter.UpdatePrice(GetPrice(currentBusinessDay));
+        }
+
+        private void UpdateScrapMetalPrice()
+        {
+            _scrapMetalPriceAdapter.UpdatePrice(GetPrice(_time.GetBusinessDaysPassed()));
+        }
+
+        private float GetPrice(int businessDay)
+        {
+            return _priceGenerator.Sample(businessDay + ScrapMetalPriceAdapter.historyOffset);
+        }
+    }
 }

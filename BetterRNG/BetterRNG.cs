@@ -92,6 +92,16 @@ namespace BetterRNG
             var weather_fix = new WeatherPatcher(temperatureFn, snowGenerator);
             weather_fix.Patch();
 
+            var scrapPriceFn = new ScrapMetalPriceGenerator(
+                new NoiseFunction1D(valueNoise, 0.5f, 1f, 0f),
+                new NoiseFunction1D(valueNoise, 0.15f, 1f, 0f))
+            {
+                RegimeWeight = 1.25f,
+                Sigma = 0.9f,
+            };
+            var scrapPriceFix = new ScrapMetalPricePatcher(scrapPriceFn);
+            scrapPriceFix.Patch();
+
 
 #if DEBUG
             // Create a graph of the temperature generator function
