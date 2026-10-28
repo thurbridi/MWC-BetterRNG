@@ -1,5 +1,6 @@
 ﻿using HutongGames.PlayMaker;
 using MSCCoreLibrary;
+using System;
 
 namespace BetterRNG
 {
@@ -37,8 +38,19 @@ namespace BetterRNG
         public int GetBusinessDaysPassed()
         {
             int daysPassed = GetDaysPassed();
-            int dayOfWeek = GetWeekDay();
-            return daysPassed / 7 * 5 + (dayOfWeek < 5 ? dayOfWeek : 5);
+            return CalculateBusinessDaysPassed(daysPassed);
+        }
+
+        /// <summary>
+        /// Calculates business passed, assuming `daysPassed=0` begins on a monday.
+        /// </summary>
+        /// <param name="daysPassed"></param>
+        /// <returns></returns>
+        public static int CalculateBusinessDaysPassed(int daysPassed)
+        {
+            int fullWeeks = daysPassed / 7;
+            int remainingDays = daysPassed % 7;
+            return fullWeeks + Math.Min(remainingDays, 5);
         }
 
         /// <summary>

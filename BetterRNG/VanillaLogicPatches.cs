@@ -1,4 +1,5 @@
-﻿using MSCCoreLibrary;
+﻿using System;
+using MSCCoreLibrary;
 using MSCLoader;
 
 namespace BetterRNG
@@ -126,11 +127,18 @@ namespace BetterRNG
 
         public void Patch()
         {
-            _scrapMetalPriceAdapter.SetLogicFsmActive(false);
-            ModConsole.Log("Disabled vanilla scrap metal price logic.");
-            GeneratePriceHistory();
-            ScheduleScrapMetalPriceUpdate();
-            ModConsole.Log("Scheduled scrap metal price updates.");
+            try
+            {
+                GeneratePriceHistory();
+                ScheduleScrapMetalPriceUpdate();
+                ModConsole.Log("Scheduled scrap metal price updates.");
+                _scrapMetalPriceAdapter.SetLogicFsmActive(false);
+                ModConsole.Log("Disabled vanilla scrap metal price logic.");
+            }
+            catch (Exception e)
+            {
+                ModConsole.Error($"Failed to patch scrap price logic. Error: {e}");
+            }
         }
 
         private void ScheduleScrapMetalPriceUpdate()
