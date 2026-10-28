@@ -1,0 +1,21 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Build Debug and Deploy",
+      "type": "shell",
+      "command": "dotnet build -p:Configuration=Debug && cp BetterRNG/bin/Debug/net35/BetterRNG.dll /home/casper/.local/share/Steam/steamapps/common/My\\ Winter\\ Car/Mods/BetterRNG.dll",
+      "isBackground": false,
+      "problemMatcher": ["$msCompile"],
+      "group": "build"
+    },
+    {
+      "label": "Build Release and Deploy",
+      "type": "shell",
+      "command": "dotnet build -p:Configuration=Release && cp BetterRNG/bin/Release/net35/BetterRNG.dll /home/casper/.local/share/Steam/steamapps/common/My\\ Winter\\ Car/Mods/BetterRNG.dll",
+      "isBackground": false,
+      "problemMatcher": ["$msCompile"],
+      "group": "build"
+    }
+  ]
+}
